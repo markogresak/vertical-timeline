@@ -1,0 +1,31 @@
+.timeline {
+  position: relative; }
+
+.tl-block {
+  position: absolute;
+  left: 150px;
+  border: 2px solid #fff;
+  background-color: #888;
+  width: 10px;
+  height: 10px; }
+  .tl-block:hover + .tl-date-label {
+    display: block; }
+
+.tl-date-label {
+  display: none;
+  position: absolute;
+  left: 0;
+  width: 140px;
+  text-align: right;
+  color: #888;
+  font-style: italic; }
+
+.tl-line {
+  position: absolute;
+  top: 0;
+  left: 155px;
+  border: 1px solid #aaa;
+  background-color: #888;
+  width: 2px; }
+
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,45 @@
+// sass --watch style.scss
+$date-width: 140px;
+$block-size: 10px;
+$bg-color: #fff;
+$main-color: #888;
+$highlight-color: #aaa;
+$line-width: 2px;
+
+.timeline {
+  position: relative;
+}
+
+.tl-block {
+  position: absolute;
+  left: $date-width + 10;
+  border: $line-width solid $bg-color;
+  background-color: $main-color;
+  width: $block-size;
+  height: $block-size;
+
+  &:hover {
+    + .tl-date-label {
+      display: block;
+    }
+  }
+}
+
+.tl-date-label {
+  display: none;
+  position: absolute;
+  left: 0;
+  width: $date-width;
+  text-align: right;
+  color: $main-color;
+  font-style: italic;
+}
+
+.tl-line {
+  position: absolute;
+  top: 0;
+  left: $date-width + 15;
+  border: 1px solid $highlight-color;
+  background-color: $main-color;
+  width: $line-width;
+}
