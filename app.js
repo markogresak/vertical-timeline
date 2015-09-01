@@ -64,8 +64,11 @@
   }
 
   function loadTimeline() {
-    $('.timeline').timeline({
-      data: []
+    $.getJSON('./data.json', function (data) {
+      for (var i = 0; i < data.length; i++) {
+        data[i].date = new Date(data[i].date);
+      }
+      $('.timeline').timeline({ data: data });
     });
   }
 
