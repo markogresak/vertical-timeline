@@ -6,6 +6,9 @@
       space: 30,
       data: []
     },
+    _destroy: function () {
+      // this.element.empty();
+    },
     _create: function () {
       // Store sorted options as local variables (less typing).
       var markerSpacing = this.options.space;
@@ -20,7 +23,7 @@
         return $('<div />').css('top', space);
       }
       var labelLineHeight = function (markerSpacing) {
-        return (markerSpacing / 2) + 'px'
+        return (markerSpacing / 2) + 'px';
       }
       /**
        * Generate date label and point on timeline.
@@ -58,18 +61,21 @@
       }
 
       // Draw date markers.
-      var separatorCount = 0;
+      var separatorCount = 1;
+      var space = function (i) {
+        return markerSpacing * (i + separatorCount);
+      }
+      // Append first date.
+      this.element.append(separator(markerSpacing / 4, data[0].date));
       for (var i = 0; i < data.length; i++) {
         var d = data[i].date;
-        var space = markerSpacing * (i + separatorCount);
         // Check if month separator should be added.
         if (i > 0 && isDifferentMonth(d, data[i - 1].date)) {
-          this.element.append(separator(space + (markerSpacing / 4), d));
+          this.element.append(separator(space(i) + (markerSpacing / 4), d));
           // Increase separatorCount and recalculate space for next element.
           separatorCount++;
-          space = markerSpacing * (i + separatorCount);
         }
-        this.element.append(datePoint(space, d));
+        this.element.append(datePoint(space(i), d));
       }
       // Calculate total height of timeline and add vertical line.
       this.element.append($('<div />').addClass('tl-line').css('height', ((data.length + separatorCount) - 1) * markerSpacing));
