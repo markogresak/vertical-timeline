@@ -3,14 +3,12 @@
 
   $.widget('pi.timeline', {
     options: {
-      maxHeight: 1000,
       space: 30,
       data: []
     },
     _create: function () {
       // Store sorted options as local variables (less typing).
-      var maxHeight = this.options.maxHeight;
-      var space = this.options.space;
+      var markerSpacing = this.options.space;
       var data = this.options.data;
       // Empty element wrapper.
       this.element.empty();
@@ -18,27 +16,63 @@
       if (data.length === 0) {
         return;
       }
-      // Calculate total height of timeline.
-      var height = Math.min((data.length - 1) * space, maxHeight);
-
-      var markerSpacing = Math.min(space, Math.round(maxHeight / (data.length - 1)));
-
-      // Add vertical line.
-      this.element.append($('<div />').addClass('tl-line').css('height', height));
+      var template = function (space) {
+        return $('<div />').css('top', space);
+      }
+      var labelLineHeight = function (markerSpacing) {
+        return (markerSpacing / 2) + 'px'
+      }
+      /**
+       * Generate date label and point on timeline.
+       * @param  {number} space Padding between 2 date points.
+       * @param  {Date} date    Date to be added.
+       * @return {[Element]}    Array of [block, label] jQuery elements.
+       */
       var datePoint = function (space, date) {
         // Initialize template.
-        var template = $('<div />').css('top', space);
         // Create timeline block (marker) from template.
-        var block = template.clone().addClass('tl-block');
+        var block = template(space).addClass('tl-block');
         // Create date label from template.
-        var label = template.clone().addClass('tl-date-label').css('line-height', markerSpacing / 2 + 'px').text($.datepicker.formatDate("d. MM y", date));
+        var label = template(space).addClass('tl-date-label').css('line-height', labelLineHeight(markerSpacing)).text($.datepicker.formatDate("DD, d.", date));
         return [block, label];
       };
+      /**
+       * Generate separator element.
+       * @param  {number} space Padding between 2 date points.
+       * @param  {number} month Index of month.
+       * @return {Element}      Separator line element.
+       */
+      var separator = function (space, date) {
+        var el = template(space).addClass('tl-separator').css('line-height', labelLineHeight(markerSpacing));
+        return el.append($('<span style="" />').text($.datepicker.formatDate("MM yy", date)));
+      };
+
+      /**
+       * Determine if second date is different month/year than first.
+       * @param  {Date}  d1 First date to compare.
+       * @param  {Date}  d2 Second date to compare.
+       * @return {Boolean}  True if it is different month, false if they are the same.
+       */
+      var isDifferentMonth = function (d1, d2) {
+        return !(d1.getMonth() === d2.getMonth() && d1.getYear() === d2.getYear());
+      }
 
       // Draw date markers.
-      for (i = 0; i < data.length; i++) {
-        this.element.append(datePoint(markerSpacing * i, data[i].date));
+      var separatorCount = 0;
+      for (var i = 0; i < data.length; i++) {
+        var d = data[i].date;
+        var space = markerSpacing * (i + separatorCount);
+        // Check if month separator should be added.
+        if (i > 0 && isDifferentMonth(d, data[i - 1].date)) {
+          this.element.append(separator(space + (markerSpacing / 4), d));
+          // Increase separatorCount and recalculate space for next element.
+          separatorCount++;
+          space = markerSpacing * (i + separatorCount);
+        }
+        this.element.append(datePoint(space, d));
       }
+      // Calculate total height of timeline and add vertical line.
+      this.element.append($('<div />').addClass('tl-line').css('height', ((data.length + separatorCount) - 1) * markerSpacing));
     }
   });
 
@@ -66,7 +100,7 @@
   function loadTimeline() {
     $.getJSON('./data.json', function (data) {
       for (var i = 0; i < data.length; i++) {
-        data[i].date = new Date(data[i].date);
+        data[i].date = new Date(data[i].departure_date); // departure_date is key from API
       }
       $('.timeline').timeline({ data: data });
     });
@@ -77,40 +111,4 @@
     loadTimeline();
   });
 
-})(jQuery);
-
-// -----------------------
-
-(function test($) {
-
-  var N = 1;
-
-  function _generateData(n) {
-    n = n || 20;
-    var d = new Date('8/31/15');
-    return Array.apply(null, {
-      length: n
-    }).map(function (_i, i) {
-      return {
-        date: new Date(d.getTime() + 604800000 * (i + 1))
-      };
-    });
-  }
-
-  function addNext() {
-    $('.timeline').remove();
-    $('body').append($('<div />').addClass('timeline'));
-    $('.timeline').timeline({
-      data: _generateData(N++)
-    });
-  }
-
-  $(function () {
-    $('#next').click(addNext);
-    $('#next10').click(function () {
-      Array.apply(null, {
-        length: 10
-      }).forEach(addNext);
-    });
-  });
 })(jQuery);

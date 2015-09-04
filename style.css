@@ -1,18 +1,23 @@
+body {
+  font-family: sans-serif; }
+
 .timeline {
-  position: relative; }
+  position: relative;
+  z-index: 0; }
 
 .tl-block {
   position: absolute;
   left: 150px;
+  z-index: 1;
   border: 2px solid #fff;
   background-color: #888;
   width: 10px;
   height: 10px; }
   .tl-block:hover + .tl-date-label {
-    display: block; }
+    font-weight: bold; }
 
-.tl-date-label {
-  display: none;
+.tl-date-label,
+.tl-separator {
   position: absolute;
   left: 0;
   width: 140px;
@@ -27,5 +32,15 @@
   border: 1px solid #aaa;
   background-color: #888;
   width: 2px; }
+
+.tl-separator {
+  background-color: #888;
+  height: 1px;
+  text-align: center; }
+  .tl-separator span {
+    position: relative;
+    top: -7.5px;
+    background-color: #fff;
+    padding: 0 10px; }
 
 /*# sourceMappingURL=style.css.map */
